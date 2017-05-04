@@ -3,6 +3,7 @@ from google.appengine.api import users
 
 from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
 
+
 class IndexView(TemplateView):
 	template_name = 'guestbook/main_page.html'
 	context_object_name = 'greetings'
