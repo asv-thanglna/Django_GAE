@@ -5,24 +5,24 @@
 </head>
 <body>
 	<table>
-		{% for greeting in guestbook_list %}
-			<tr>
-				<td>
-				{% if greeting.author.nickname %}
-					<b>{{ greeting.author }}</b> wrote:
-				{% else %}
-					An anonymous person wrote:
-				{% endif %}
-				</td>
-				<td>{{ greeting.content|escape }}</td>
-				<td><a href="{% url 'update' %}?guestbook_id=
-				{{ greeting.id }}&guestbook_name={{ guestbook_name }}">update</a></td>
-				<td><a href="{% url 'delete' %}?guestbook_id=
-				{{ greeting.id }}&guestbook_name={{ guestbook_name }}">delete</a></td>
-			</tr>
-		{% endfor %}
+	{% for greeting in guestbook_list %}
+		<tr>
+		<td>
+		{% if greeting.author.nickname %}
+			<b>{{ greeting.author }}</b> wrote:
+		{% else %}
+			An anonymous person wrote:
+		{% endif %}
+		</td>
+		<td>
+			<blockquote>{{ greeting.content|escape }}</blockquote>
+		</td>
+		<td><a href="{% url 'update' %}?guestbook_id={{ greeting.id }}&guestbook_name={{ guestbook_name }}">update</a></td>
+		<td><a href="{% url 'delete' greeting.id %}?guestbook_id={{ greeting.id }}&guestbook_name
+		={{ guestbook_name }}">delete</a></td>
+		</tr>
+	{% endfor %}
 	</table>
-
 	{% if guestbook_list|length > 0 %}
 		<a href="{% url 'index' %}?guestbook_name={{ guestbook_name }}">first</a>
 		{% if more %}

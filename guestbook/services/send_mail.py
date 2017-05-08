@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from google.appengine.api import mail
 from google.appengine.ext import ndb, deferred
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.template.loader import render_to_string
 import webapp2
 import settings
 import logging
@@ -11,7 +15,7 @@ def add_queue_send_mail(user, guestbook_name, text_content):
 		sender = user
 		to = 'test@aoi-sys.vn'
 		subject = 'Sign New Guestbook %s' % guestbook_name
-		enqueue_task(send_mail, sender, to, subject, guestbook_name, text_content,
+		enqueue_task(send_mail_using_django, sender, to, subject, guestbook_name, text_content,
 			_queue='email', _countdown=10, _transactional=True)
 
 
@@ -36,6 +40,23 @@ def send_mail(sender, to, subject, guestbook_name, text_content):
 		subject=subject,
 		body=text_content
 	)
+	return
+
+
+def send_mail_using_django(sender, to, subject, guestbook_name, text_content):
+	logging.info('send_mail_using_django')
+	connect = get_connection()
+	try:
+		connect.open()
+		html_content = render_to_string('guestbook/mail_content.html', {'user': sender,
+		'guestbook_name': guestbook_name, 'content': text_content})
+		msg = EmailMultiAlternatives(subject, text_content, sender, [to])
+		msg.attach_alternative(html_content, "text/html")
+		msg.send()
+	except BaseException, e:
+		raise e
+	finally:
+		connect.close()
 	return
 
 

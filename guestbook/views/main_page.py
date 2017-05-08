@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from django.views.generic import TemplateView
 from google.appengine.api import users
 
 from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
-import logging
 
 
 class IndexView(TemplateView):
@@ -23,7 +24,6 @@ class IndexView(TemplateView):
 			Greeting.get_greeting_by_page(guestbook_name, urlsafe)
 		context['guestbook_name'] = guestbook_name
 
-		logging.info(context['guestbook_list'])
 		return context
 
 	def get(self, request, *args, **kwargs):
