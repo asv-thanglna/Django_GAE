@@ -2,7 +2,7 @@ from google.appengine.ext import ndb
 from google.appengine.datastore.datastore_query import Cursor
 
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
-
+import logging
 
 def guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
 	'''Constructs a Datastore key for a Guestbook entity with guestbook_name.'''
@@ -24,6 +24,8 @@ class Greeting(ndb.Model):
 		next_urlsafe = ''
 		if next_cursor is not None:
 			next_urlsafe = next_cursor.urlsafe
+		for data in datas:
+			data.id = data.get_id()
 		return datas, next_urlsafe, more
 
 	@classmethod
@@ -35,3 +37,15 @@ class Greeting(ndb.Model):
 		greeting.content = content
 		greeting.put()
 		return greeting
+
+	@classmethod
+	def get_greeting(self, id, guestbook_name):
+		greeting = Greeting.get_by_id(id, parent=guestbook_key(guestbook_name))
+		return greeting
+
+	def get_id(self):
+		return self.key.id()
+
+	@ndb.transactional
+	def update(self):
+		self.put()
