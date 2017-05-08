@@ -18,8 +18,15 @@
 			<blockquote>{{ greeting.content|escape }}</blockquote>
 		</td>
 		<td><a href="{% url 'update' %}?guestbook_id={{ greeting.id }}&guestbook_name={{ guestbook_name }}">update</a></td>
-		<td><a href="{% url 'delete' greeting.id %}?guestbook_id={{ greeting.id }}&guestbook_name
-		={{ guestbook_name }}">delete</a></td>
+		<td>
+			<form id="deleteForm_{{ greeting.id }}" action="
+			{% url 'delete' greeting.id guestbook_name %}" method="post">
+				{% csrf_token %}
+				<a href="#" onclick="document.getElementById('deleteForm_{{ greeting.id }}')
+						.submit()
+						">delete</a>
+			</form>
+			</td>
 		</tr>
 	{% endfor %}
 	</table>

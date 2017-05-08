@@ -48,6 +48,5 @@ class Greeting(ndb.Model):
 	def get_id(self):
 		return self.key.id()
 
-	@ndb.transactional
 	def update(self):
 		self.put()
