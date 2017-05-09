@@ -2,7 +2,7 @@
 
 from google.appengine.ext import ndb
 from google.appengine.datastore.datastore_query import Cursor
-import logging
+
 
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 
@@ -10,35 +10,6 @@ DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 def guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
 	'''Constructs a Datastore key for a Guestbook entity with guestbook_name.'''
 	return ndb.Key('Guestbook', guestbook_name)
-
-
-def greeting_to_obj(obj, guestbook_name):
-		author = ''
-		if obj.author is not None:
-			author = obj.author.email()
-		updated_by = ''
-		if obj.updated_by is not None:
-			updated_by = obj.updated_by.email()
-		updated_date = ''
-		if obj.updated_date is not None:
-			updated_date = obj.updated_date.strftime('%Y-%m-%d %H:%M:%S')
-
-		return {
-			'id': obj.get_id(),
-			'author': author,
-			'content': obj.content,
-			'date': obj.date.strftime('%Y-%m-%d %H:%M:%S'),
-			'updated_by': updated_by,
-			'updated_date': updated_date,
-			'url': '/api/v1/' + guestbook_name + '/' + str(obj.get_id()) + '/'
-		}
-
-
-def greeting_to_dict(args, guestbook_name):
-	results = []
-	for arg in args:
-		results.append(greeting_to_obj(arg, guestbook_name))
-	return results
 
 
 class Greeting(ndb.Model):
@@ -51,11 +22,10 @@ class Greeting(ndb.Model):
 	updated_by = ndb.UserProperty()
 
 	@classmethod
-	def get_greeting_by_page(self, guestbook_name, urlsafe=''):
-		nums_of_page = 5
-		cursor = Cursor(urlsafe=urlsafe)
+	def get_greeting_by_page(cls, guestbook_name, limit, cursor, **kwargs):
+		start_cursor = Cursor(urlsafe=cursor)
 		datas, next_cursor, more = Greeting.query(ancestor=guestbook_key(guestbook_name)).order(
-			-Greeting.date).fetch_page(nums_of_page, start_cursor=cursor)
+			-Greeting.date).fetch_page(limit, start_cursor=start_cursor)
 		next_urlsafe = ''
 		if next_cursor is not None:
 			next_urlsafe = next_cursor.urlsafe()
@@ -83,3 +53,17 @@ class Greeting(ndb.Model):
 
 	def update(self):
 		self.put()
+
+	def to_resource_dict(self, guestbook_name=DEFAULT_GUESTBOOK_NAME):
+		result = {
+			'id': self.get_id(),
+			'content': self.content,
+			'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
+			'url': '/api/v1/' + guestbook_name + '/' + str(self.get_id()) + '/'
+		}
+		if self.author is not None:
+			result['author'] = self.author.email()
+		if self.updated_by is not None and self.updated_date is not None:
+			result['updated_by'] = self.updated_by.email()
+			result['updated_date'] = self.updated_date.strftime('%Y-%m-%d %H:%M:%S')
+		return result

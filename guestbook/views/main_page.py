@@ -21,7 +21,7 @@ class IndexView(TemplateView):
 		urlsafe = self.request.GET.get('urlsafe', '')
 		context = super(IndexView, self).get_context_data(**kwargs)
 		context['guestbook_list'], context['urlsafe'], context['more'] = \
-			Greeting.get_greeting_by_page(guestbook_name, urlsafe)
+			Greeting.get_greeting_by_page(guestbook_name, 5, urlsafe)
 		context['guestbook_name'] = guestbook_name
 
 		return context

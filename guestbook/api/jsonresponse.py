@@ -14,3 +14,9 @@ class JSONResponseMixin(object):
 
 	def convert_context_to_json(self, context):
 		return json.dumps(context)
+
+	def snake_case_to_camel(self, *args, **kwargs):
+		return
+
+	def camel_to_snake_case(self, *args, **kwargs):
+		return

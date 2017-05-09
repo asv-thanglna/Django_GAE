@@ -2,18 +2,24 @@
 
 from django.views.generic import TemplateView
 from guestbook.api import jsonresponse
-from guestbook.models import Greeting, greeting_to_obj, greeting_to_dict
+from guestbook.models import Greeting
+import logging
 
 
 class GreetingList(jsonresponse.JSONResponseMixin, TemplateView):
 
 	def get_context_data(self, **kwargs):
-		urlsafe = self.request.GET.get('urlsafe', '')
+		logging.info(kwargs)
+		cursor = self.request.GET.get('cursor', '')
 		guestbook_name = kwargs['guestbook_name']
-		greetings, next_urlsafe, more = Greeting.get_greeting_by_page(guestbook_name, urlsafe)
-		context = {}
-		context['guestbook_name'] = guestbook_name
-		context['greetings'] = greeting_to_dict(greetings, guestbook_name)
+		greetings, next_urlsafe, more = Greeting.get_greeting_by_page(guestbook_name, 5, cursor)
+		context = {
+			'guestbook_name': guestbook_name
+		}
+		results = []
+		for greeting in greetings:
+			results.append(greeting.to_resource_dict(guestbook_name=guestbook_name))
+		context['greetings'] = results
 		context['next_cursor'] = next_urlsafe
 		context['total_items'] = len(greetings)
 		return context
@@ -30,7 +36,7 @@ class GreetingDetail(jsonresponse.JSONResponseMixin, TemplateView):
 		greeting = Greeting.get_greeting(int(greeting_id), guestbook_name)
 		context = {}
 		if greeting:
-			context = greeting_to_obj(greeting, guestbook_name)
+			context = greeting.to_resource_dict(guestbook_name)
 			context['guestbook_name'] = guestbook_name
 		return context
 
