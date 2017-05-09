@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Django settings for django_appengine project.
 import os
 import logging

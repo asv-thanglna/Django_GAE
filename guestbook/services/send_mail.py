@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from google.appengine.api import mail
 from google.appengine.ext import ndb, deferred
 from django.core.mail import EmailMultiAlternatives, get_connection
