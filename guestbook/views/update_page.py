@@ -55,6 +55,8 @@ class UpdateView(FormView):
 
 		@ndb.transactional
 		def txn():
+			greeting.updated_by = user
+			greeting.content = form.cleaned_data['content']
 			greeting.update()
 
 		if greeting:
@@ -62,7 +64,6 @@ class UpdateView(FormView):
 				txn()
 			else:
 				if user and greeting.author == user:
-					greeting.content = form.cleaned_data['content']
 					txn()
 				else:
 					logging.warning('not update greeting')
