@@ -23,7 +23,6 @@ class IndexView(TemplateView):
 		context['guestbook_list'], context['urlsafe'], context['more'] = \
 			Greeting.get_greeting_by_page(guestbook_name, 5, urlsafe)
 		context['guestbook_name'] = guestbook_name
-
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -34,7 +33,6 @@ class IndexView(TemplateView):
 		else:
 			url = users.create_login_url(request.get_full_path())
 			url_linktext = 'Login'
-
 		context['url'] = url
 		context['url_linktext'] = url_linktext
 		return self.render_to_response(context)
