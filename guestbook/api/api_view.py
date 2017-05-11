@@ -43,11 +43,11 @@ class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
 		guestbook_name = kwargs['guestbook_name']
 		greeting_id = kwargs['greeting_id']
 		greeting = Greeting.get_greeting(int(greeting_id), guestbook_name)
-		context = {}
 		if greeting:
 			context = greeting.to_resource_dict(guestbook_name)
 			context['guestbook_name'] = guestbook_name
-		return self.render_to_response(context)
+			return self.render_to_response(context, status=200)
+		return self.render_to_response({'status': 'error'}, status=404)
 
 	def put(self, *args, **kwargs):
 		body_unicode = self.request.body
@@ -71,10 +71,10 @@ class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
 		if greeting:
 			if user and (users.is_current_user_admin() or user == greeting.author):
 				txn()
-
-		context = {'status': 'ok'}
-		return self.render_to_response(context)
+				context = {'msg': 'ok'}
+				return self.render_to_response(context, status=200)
+			return self.render_to_response({'msg': 'error'}, status=401)
+		return self.render_to_response({'msg': 'error'}, status=404)
 
 	def form_invalid(self, form):
-		context = {'status': 'error'}
-		return self.render_to_response(context)
+		return self.render_to_response({'msg': 'error'}, status=400)
