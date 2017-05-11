@@ -5,6 +5,6 @@ from django import forms
 
 class GreetingDetailForm(forms.Form):
 
-	guestbook_id = forms.IntegerField()
+	greeting_id = forms.IntegerField()
 	guestbook_name = forms.CharField()
-	content = forms.CharField(max_length=1000)
+	content = forms.CharField(max_length=1000, required=False)
