@@ -1,1 +1,1 @@
-from api_view import GreetingList, GreetingDetail
+from api_view import GreetingService, GreetingDetail

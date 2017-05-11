@@ -1,16 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from django.views.generic import TemplateView
-from guestbook.api import jsonresponse
+from django.views.generic import TemplateView, FormView
+from guestbook.api import JsonResponse, form
 from guestbook.models import Greeting
+from google.appengine.api import datastore_errors
+from google.appengine.datastore.datastore_query import Cursor
+from django.http import HttpResponse
 
 
-class GreetingList(jsonresponse.JSONResponseMixin, TemplateView):
+class GreetingService(JsonResponse.JSONResponseMixin, TemplateView):
 
 	def get_context_data(self, **kwargs):
-		cursor = self.request.GET.get('cursor', '')
+		try:
+			cur = Cursor(urlsafe=self.request.GET.get('cursor', ''))
+		except datastore_errors.BadQueryError:
+			return HttpResponse(status=404)
 		guestbook_name = kwargs['guestbook_name']
-		greetings, next_urlsafe, more = Greeting.get_greeting_by_page(guestbook_name, 5, cursor)
+		limit = int(self.request.GET.get('limit', 5))
+		greetings, next_urlsafe, more = Greeting.get_greeting_by_page(guestbook_name, limit, cur)
 		context = {
 			'guestbook_name': guestbook_name
 		}
@@ -22,13 +29,12 @@ class GreetingList(jsonresponse.JSONResponseMixin, TemplateView):
 		context['total_items'] = len(greetings)
 		return context
 
-	def render_to_response(self, context, **response_kwargs):
-		return self.render_to_json_response(context, **response_kwargs)
 
+class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
 
-class GreetingDetail(jsonresponse.JSONResponseMixin, TemplateView):
+	form_class = form.GreetingDetailForm
 
-	def get_context_data(self, **kwargs):
+	def get(self, request, *args, **kwargs):
 		guestbook_name = kwargs['guestbook_name']
 		greeting_id = kwargs['greeting_id']
 		greeting = Greeting.get_greeting(int(greeting_id), guestbook_name)
@@ -36,7 +42,4 @@ class GreetingDetail(jsonresponse.JSONResponseMixin, TemplateView):
 		if greeting:
 			context = greeting.to_resource_dict(guestbook_name)
 			context['guestbook_name'] = guestbook_name
-		return context
-
-	def render_to_response(self, context, **response_kwargs):
-		return self.render_to_json_response(context, **response_kwargs)
+		return self.render_to_response(context)

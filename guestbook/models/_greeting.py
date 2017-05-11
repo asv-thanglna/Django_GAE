@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from google.appengine.ext import ndb
-from google.appengine.datastore.datastore_query import Cursor
 
 
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
@@ -23,9 +22,8 @@ class Greeting(ndb.Model):
 
 	@classmethod
 	def get_greeting_by_page(cls, guestbook_name, limit, cursor, **kwargs):
-		start_cursor = Cursor(urlsafe=cursor)
 		datas, next_cursor, more = Greeting.query(ancestor=guestbook_key(guestbook_name)).order(
-			-Greeting.date).fetch_page(limit, start_cursor=start_cursor)
+			-Greeting.date).fetch_page(limit, start_cursor=cursor)
 		next_urlsafe = ''
 		if next_cursor is not None:
 			next_urlsafe = next_cursor.urlsafe()

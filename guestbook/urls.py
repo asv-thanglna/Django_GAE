@@ -2,7 +2,7 @@
 
 from django.conf.urls.defaults import *
 from guestbook.views import IndexView, SignView, UpdateView, DeleteView
-from guestbook.api import GreetingList, GreetingDetail
+from guestbook.api import GreetingService, GreetingDetail
 
 urlpatterns = patterns('',
 	url(r'^$', IndexView.as_view(), name='index', ),
@@ -11,7 +11,7 @@ urlpatterns = patterns('',
 	url(r'^delete/(?P<guestbook_id>[0-9].*)/(?P<guestbook_name>.*)/$', DeleteView.as_view(), name='delete'),
 
 	## greeting apis
-	url(r'^api/v1/(?P<guestbook_name>.*)/greetings/$', GreetingList.as_view(),
+	url(r'^api/v1/(?P<guestbook_name>.*)/greetings/$', GreetingService.as_view(),
 		name='greeting_list'),
 	url(r'^api/v1/(?P<guestbook_name>.*)/(?P<greeting_id>[0-9].*)/$', GreetingDetail.as_view(),
 		name='greeting_detail'),
