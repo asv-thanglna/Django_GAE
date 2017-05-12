@@ -19,8 +19,8 @@
 {#		$.get("http://127.0.0.1:8080/api/v1/default_guestbook/greetings/");#}
 		$.ajax({
 			url: "http://127.0.0.1:8080/api/v1/default_guestbook/6612462929444864/",
-			method: "PUT",
-			data: JSON.stringify({ 'content': 'new content' }),
+			method: "DELETE",
+{#			data: JSON.stringify({ 'content': 'new content' }),#}
 {#			dataType: 'json',#}
 			contentType: 'application/json; charset=utf-8',
 			success: function(data){

@@ -8,7 +8,7 @@ from google.appengine.datastore.datastore_query import Cursor
 from django.http import HttpResponse
 from google.appengine.ext import ndb
 import json
-
+import logging
 
 class GreetingService(JsonResponse.JSONResponseMixin, TemplateView):
 
@@ -78,3 +78,29 @@ class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
 
 	def form_invalid(self, form):
 		return self.render_to_response({'msg': 'error'}, status=400)
+
+	def delete(self, request, *args, **kwargs):
+		try:
+			guestbook_name = kwargs['guestbook_name']
+			greeting_id = int(kwargs['greeting_id'])
+			greeting = Greeting.get_greeting(greeting_id, guestbook_name)
+		except BaseException, e:
+			logging.warning(e.message)
+			return self.render_to_response({'msg': 'error'}, status=400)
+
+		@ndb.transactional
+		def txn():
+			greeting.key.delete()
+
+		if greeting:
+			if users.is_current_user_admin():
+				txn()
+				return self.render_to_response({'msg': 'ok'}, status=200)
+			else:
+				user = users.get_current_user()
+				if user and greeting.author == user:
+					txn()
+					return self.render_to_response({'msg': 'ok'}, status=200)
+				else:
+					return self.render_to_response({'msg': 'error'}, status=401)
+		return self.render_to_response({'msg': 'error'}, status=404)
