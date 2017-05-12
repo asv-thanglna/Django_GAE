@@ -4,6 +4,9 @@ from django.views.generic import TemplateView
 from google.appengine.api import users
 
 from guestbook.models import Greeting, DEFAULT_GUESTBOOK_NAME
+from google.appengine.api import datastore_errors
+from google.appengine.datastore.datastore_query import Cursor
+from django.http import Http404
 
 
 class IndexView(TemplateView):
@@ -16,16 +19,6 @@ class IndexView(TemplateView):
 			guestbook_name = DEFAULT_GUESTBOOK_NAME
 		return guestbook_name
 
-	def get_context_data(self, **kwargs):
-		guestbook_name = self.get_guestbook_name()
-		urlsafe = self.request.GET.get('urlsafe', '')
-		context = super(IndexView, self).get_context_data(**kwargs)
-		context['guestbook_list'], context['urlsafe'], context['more'] = \
-			Greeting.get_greeting_by_page(guestbook_name, urlsafe)
-		context['guestbook_name'] = guestbook_name
-
-		return context
-
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
 		if users.get_current_user():
@@ -34,7 +27,17 @@ class IndexView(TemplateView):
 		else:
 			url = users.create_login_url(request.get_full_path())
 			url_linktext = 'Login'
-
 		context['url'] = url
 		context['url_linktext'] = url_linktext
+
+		guestbook_name = self.get_guestbook_name()
+		try:
+			cur = Cursor(urlsafe=self.request.GET.get('cursor', ''))
+		except datastore_errors.BadQueryError:
+			return Http404
+
+		limit = int(self.request.GET.get('limit', 5))
+		context['guestbook_list'], context['next_cursor'], context['more'] = \
+			Greeting.get_greeting_by_page(guestbook_name, limit, cur)
+		context['guestbook_name'] = guestbook_name
 		return self.render_to_response(context)
