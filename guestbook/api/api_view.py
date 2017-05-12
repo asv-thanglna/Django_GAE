@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 
 from django.views.generic import TemplateView, FormView
-from guestbook.api import JsonResponse, form
-from guestbook.models import Greeting
+from django.http import HttpResponse
+
 from google.appengine.api import datastore_errors, users
 from google.appengine.datastore.datastore_query import Cursor
-from django.http import HttpResponse
 from google.appengine.ext import ndb
+
+
+from guestbook.api import ff, form
+from guestbook.models import Greeting as g
 import json
 import logging
 
 
-class GreetingService(JsonResponse.JSONResponseMixin, TemplateView):
+class Greetings(ff.JSONResponseMixin, TemplateView):
 
 	def get_context_data(self, **kwargs):
 		try:
@@ -20,7 +23,7 @@ class GreetingService(JsonResponse.JSONResponseMixin, TemplateView):
 			return HttpResponse(status=404)
 		guestbook_name = kwargs['guestbook_name']
 		limit = int(self.request.GET.get('limit', 5))
-		greetings, next_urlsafe, more = Greeting.get_greeting_by_page(guestbook_name, limit, cur)
+		greetings, next_urlsafe, more = g.get_greeting_by_page(guestbook_name, limit, cur)
 		context = {
 			'guestbook_name': guestbook_name
 		}
@@ -33,7 +36,7 @@ class GreetingService(JsonResponse.JSONResponseMixin, TemplateView):
 		return context
 
 
-class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
+class Greeting(ff.JSONResponseMixin, FormView):
 
 	form_class = form.GreetingDetailForm
 
@@ -43,7 +46,7 @@ class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
 	def get(self, request, *args, **kwargs):
 		guestbook_name = kwargs['guestbook_name']
 		greeting_id = kwargs['greeting_id']
-		greeting = Greeting.get_greeting(int(greeting_id), guestbook_name)
+		greeting = g.get_greeting(int(greeting_id), guestbook_name)
 		if greeting:
 			context = greeting.to_resource_dict(guestbook_name)
 			context['guestbook_name'] = guestbook_name
@@ -55,10 +58,10 @@ class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
 		body = json.loads(body_unicode)
 		kwargs.update(body)
 		self.kwargs = kwargs
-		return super(GreetingDetail, self).put(*args, **kwargs)
+		return super(Greeting, self).put(*args, **kwargs)
 
 	def form_valid(self, form):
-		greeting = Greeting.get_greeting(int(form.cleaned_data['greeting_id']),
+		greeting = g.get_greeting(int(form.cleaned_data['greeting_id']),
 			form.cleaned_data['guestbook_name'])
 
 		user = users.get_current_user()
@@ -84,7 +87,7 @@ class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
 		try:
 			guestbook_name = kwargs['guestbook_name']
 			greeting_id = int(kwargs['greeting_id'])
-			greeting = Greeting.get_greeting(greeting_id, guestbook_name)
+			greeting = g.get_greeting(greeting_id, guestbook_name)
 		except BaseException, e:
 			logging.warning(e.message)
 			return self.render_to_response({'msg': 'error'}, status=400)
@@ -94,14 +97,9 @@ class GreetingDetail(JsonResponse.JSONResponseMixin, FormView):
 			greeting.key.delete()
 
 		if greeting:
-			if users.is_current_user_admin():
+			user = users.get_current_user()
+			if users.is_current_user_admin() or (user and greeting.author == user):
 				txn()
 				return self.render_to_response({'msg': 'ok'}, status=200)
-			else:
-				user = users.get_current_user()
-				if user and greeting.author == user:
-					txn()
-					return self.render_to_response({'msg': 'ok'}, status=200)
-				else:
-					return self.render_to_response({'msg': 'error'}, status=401)
+			return self.render_to_response({'msg': 'error'}, status=401)
 		return self.render_to_response({'msg': 'error'}, status=404)
