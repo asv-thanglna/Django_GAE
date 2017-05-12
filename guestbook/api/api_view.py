@@ -10,6 +10,7 @@ from google.appengine.ext import ndb
 import json
 import logging
 
+
 class GreetingService(JsonResponse.JSONResponseMixin, TemplateView):
 
 	def get_context_data(self, **kwargs):
