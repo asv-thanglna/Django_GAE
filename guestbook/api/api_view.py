@@ -8,13 +8,13 @@ from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 
 
-from guestbook.api import ff, form
+from guestbook.api import JsonResponse, form
 from guestbook.models import Greeting as g
 import json
 import logging
 
 
-class Greetings(ff.JSONResponseMixin, TemplateView):
+class Greetings(JsonResponse.JSONResponseMixin, TemplateView):
 
 	def get_context_data(self, **kwargs):
 		try:
@@ -36,7 +36,7 @@ class Greetings(ff.JSONResponseMixin, TemplateView):
 		return context
 
 
-class Greeting(ff.JSONResponseMixin, FormView):
+class Greeting(JsonResponse.JSONResponseMixin, FormView):
 
 	form_class = form.GreetingDetailForm
 
