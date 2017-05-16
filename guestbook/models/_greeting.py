@@ -13,6 +13,7 @@ def guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
 
 class Greeting(ndb.Model):
 	'''Models an individual Guestbook entry.'''
+	greeting_name = ndb.StringProperty()
 	author = ndb.UserProperty()
 	content = ndb.StringProperty(indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
@@ -33,10 +34,11 @@ class Greeting(ndb.Model):
 
 	@classmethod
 	@ndb.transactional
-	def insert_greeting(cls, guestbook_name, author=None, content=''):
+	def insert_greeting(cls, guestbook_name, greeting_name, author=None, content=''):
 		greeting = cls(parent=guestbook_key(guestbook_name))
 		if author:
 			greeting.author = author
+		greeting.greeting_name = greeting_name
 		greeting.content = content
 		greeting.put()
 		return greeting
@@ -56,6 +58,7 @@ class Greeting(ndb.Model):
 		result = {
 			'id': self.get_id(),
 			'content': self.content,
+			'greeting_name': self.greeting_name,
 			'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
 			'url': '/api/v1/' + guestbook_name + '/' + str(self.get_id()) + '/'
 		}

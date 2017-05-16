@@ -70,6 +70,7 @@ class Greeting(JsonResponse.JSONResponseMixin, FormView):
 		def txn():
 			greeting.updated_by = user
 			greeting.content = form.cleaned_data['content']
+			greeting.greeting_name = form.cleaned_data['greeting_name']
 			greeting.update()
 
 		if greeting:

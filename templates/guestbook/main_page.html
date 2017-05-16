@@ -2,7 +2,10 @@
 <html>
 <head>
 	<link type="text/css" rel="stylesheet" href="/static/css/main.css"/>
+	<link type="text/css" rel="stylesheet" href="/static/js/widgets/css/AuthorWidget.css"/>
+	<link type="text/css" rel="stylesheet" href="/static/css/GreetingWidget.css"/>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 	<script>
 		function csrfSafeMethod(method) {
 			// these HTTP methods do not require CSRF protection
@@ -17,19 +20,19 @@
 			}
 		});
 {#		$.get("http://127.0.0.1:8080/api/v1/default_guestbook/greetings/");#}
-		$.ajax({
-			url: "http://127.0.0.1:8080/api/v1/default_guestbook/6612462929444864/",
-			method: "DELETE",
+{#		$.ajax({#}
+{#			url: "http://127.0.0.1:8080/api/v1/default_guestbook/6612462929444864/",#}
+{#			method: "PUT",#}
 {#			data: JSON.stringify({ 'content': 'new content' }),#}
 {#			dataType: 'json',#}
-			contentType: 'application/json; charset=utf-8',
-			success: function(data){
-				alert(data.msg)
-			},
-			failure: function(){
-				alert('error')
-			}
-		});
+{#			contentType: 'application/json; charset=utf-8',#}
+{#			success: function(data){#}
+{#				alert(data.msg)#}
+{#			},#}
+{#			failure: function(){#}
+{#				alert('error')#}
+{#			}#}
+{#		});#}
 	</script>
 </head>
 <body>
@@ -58,6 +61,10 @@
 		</tr>
 	{% endfor %}
 	</table>
+	<br/>
+
+	<div id="greetingContainer"></div>
+
 	{% if guestbook_list|length > 0 %}
 		<a href="{% url 'index' %}?guestbook_name={{ guestbook_name }}">first</a>
 		{% if more %}
@@ -68,5 +75,51 @@
 	{% endif %}
 	<a href="{% url 'sign' %}?guestbook_name={{ guestbook_name }}">Sign GuestBook</a>
 	<a href="{{ url }}">{{ url_linktext }}</a>
+
+{#	test dojo#}
+	<div id="authorContainer"></div>
+	<script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+
+	<script>
+		var dojoConfig = {
+			async: true,
+			baseUrl: '../../static/js/dojo/1.10.4/dojo',
+			paths: {
+				widgets: '/static/js/widgets'
+			}
+		};
+	</script>
+
+	<script type="text/javascript" src="/static/js/dojo/1.10.4/dojo/dojo.js"></script>
+{#	<script>#}
+{#		require([#}
+{#				"dojo/request", "dojo/dom", "dojo/_base/array", "widgets/AuthorWidget",#}
+{#				"dojo/domReady!"#}
+{#			], function(request, dom, arrayUtil, AuthorWidget){#}
+{#				request("/static/js/widgets/authors.json", {#}
+{#					handleAs: 'json'#}
+{#				}).then(function(authors){#}
+{#					var authorContainer = dom.byId("authorContainer");#}
+{#					arrayUtil.forEach(authors, function(author){#}
+{#						var widget = new AuthorWidget(author).placeAt(authorContainer);#}
+{#					})#}
+{#				})#}
+{#			})#}
+{#	</script>#}
+	<script>
+		require([
+				"dojo/request", "dojo/dom", "dojo/_base/array", "widgets/GreetingWidget",
+				"dojo/domReady!"
+			], function(request, dom, arrayUtil, AuthorWidget){
+				request("/api/v1/default_guestbook/greetings/", {
+					handleAs: 'json'
+				}).then(function(data){
+					var greetingContainer = dom.byId("greetingContainer");
+					arrayUtil.forEach(data.greetings, function(greeting){
+						var widget = new AuthorWidget(greeting).placeAt(greetingContainer);
+					})
+				})
+			})
+	</script>
 </body>
 </html>
