@@ -8,7 +8,7 @@ libraries:
 - name: webapp2
   version: 2.5.2
 - name: django
-  version: "latest"
+  version: "1.5"
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'settings'
@@ -18,7 +18,13 @@ builtins:
 - remote_api: on
 
 skip_files:
-- ^(/)?static/css/.*
+#- ^(/)?static/css/.*
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*\.bak$
+- ^(.*/)?.*\.less$
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(/)?static/js/dojo/.*
 
 handlers:
 

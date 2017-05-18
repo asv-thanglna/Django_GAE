@@ -18,10 +18,11 @@ class UpdateView(FormView):
 		guestbook_name = self._get_guestbook_name()
 		guestbook_id = self._get_guestbook_id()
 		greeting = Greeting.get_greeting(guestbook_id, guestbook_name)
-		initial['guestbook_id'] = guestbook_id
-		initial['guestbook_name'] = guestbook_name
-		initial['greeting_name'] = greeting.greeting_name
-		initial['content'] = greeting.content
+		if greeting:
+			initial['guestbook_id'] = guestbook_id
+			initial['guestbook_name'] = guestbook_name
+			initial['greeting_name'] = greeting.greeting_name
+			initial['content'] = greeting.content
 		return initial
 
 	def _get_guestbook_id(self):

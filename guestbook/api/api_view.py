@@ -19,20 +19,28 @@ class Greetings(JsonResponse.JSONResponseMixin, TemplateView):
 	def get_context_data(self, **kwargs):
 		try:
 			cur = Cursor(urlsafe=self.request.GET.get('cursor', ''))
-		except datastore_errors.BadQueryError:
-			return HttpResponse(status=404)
+			limit = int(self.request.GET.get('limit', 5))
+		except datastore_errors.BadQueryError, exp:
+			logging.warning('error=' + exp.message)
+			return HttpResponse(status=400)
+		except ValueError, e:
+			logging.warning('error=' + e.message)
+			return HttpResponse(status=400)
+
 		guestbook_name = kwargs['guestbook_name']
-		limit = int(self.request.GET.get('limit', 5))
+		if guestbook_name == '':
+			return HttpResponse(status=400)
+
 		greetings, next_urlsafe, more = g.get_greeting_by_page(guestbook_name, limit, cur)
-		context = {
-			'guestbook_name': guestbook_name
-		}
 		results = []
 		for greeting in greetings:
 			results.append(greeting.to_resource_dict(guestbook_name=guestbook_name))
-		context['greetings'] = results
-		context['next_cursor'] = next_urlsafe
-		context['total_items'] = len(greetings)
+		context = {
+			'guestbook_name': guestbook_name,
+			'greetings': results,
+			'next_cursor': next_urlsafe,
+			'total_items': len(results)
+		}
 		return context
 
 
@@ -41,6 +49,9 @@ class Greeting(JsonResponse.JSONResponseMixin, FormView):
 	form_class = form.GreetingDetailForm
 
 	def get_form(self, form_class):
+		c = JsonResponse.snakify
+		if isinstance(self.kwargs, dict):
+			self.kwargs = {c(k): v for k, v in self.kwargs.items()}
 		return self.form_class(self.kwargs)
 
 	def get(self, request, *args, **kwargs):

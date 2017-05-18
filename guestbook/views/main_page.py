@@ -8,7 +8,7 @@ from google.appengine.api import datastore_errors
 from google.appengine.datastore.datastore_query import Cursor
 from django.http import Http404
 
-
+import logging
 class IndexView(TemplateView):
 	template_name = 'guestbook/main_page.html'
 	context_object_name = 'greetings'
@@ -24,9 +24,12 @@ class IndexView(TemplateView):
 		if users.get_current_user():
 			url = users.create_logout_url(request.get_full_path())
 			url_linktext = 'Logout'
+			user_email = users.get_current_user().email()
 		else:
 			url = users.create_login_url(request.get_full_path())
 			url_linktext = 'Login'
+			user_email = ''
+		context['user_email'] = user_email
 		context['url'] = url
 		context['url_linktext'] = url_linktext
 

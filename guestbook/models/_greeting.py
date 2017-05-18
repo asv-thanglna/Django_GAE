@@ -60,7 +60,8 @@ class Greeting(ndb.Model):
 			'content': self.content,
 			'greeting_name': self.greeting_name,
 			'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
-			'url': '/api/v1/' + guestbook_name + '/' + str(self.get_id()) + '/'
+			'url': '/api/v1/' + guestbook_name + '/' + str(self.get_id()) + '/',
+			'guestbook_name': guestbook_name
 		}
 		if self.author is not None:
 			result['author'] = self.author.email()
