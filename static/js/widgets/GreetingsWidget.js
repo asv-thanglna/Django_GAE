@@ -3,8 +3,6 @@ define([
 		"dojo/_base/declare",
 		"dojo/_base/fx",
 		"dojo/_base/lang",
-		"dojo/_base/array",
-		"dojo/dom",
 		"dojo/dom-style",
 		"dojo/mouse",
 		"dojo/on",
@@ -13,9 +11,8 @@ define([
 		"dijit/_WidgetBase",
 		"dijit/_TemplatedMixin",
 		"dijit/ConfirmDialog",
-		"dojo/text!./templates/GreetingsWidget.html",
-		"widgets/GreetingUpdate"
-	], function(declare, baseFx, lang, arrayUtil, dom, domStyle, mouse, on, request, cookie, _WidgetBase, _TemplatedMixin, ConfirmDialog, template, GreetingUpdate){
+		"dojo/text!./templates/GreetingsWidget.html"
+	], function(declare, baseFx, lang, domStyle, mouse, on, request, cookie, _WidgetBase, _TemplatedMixin, ConfirmDialog, template){
 	return declare("GreetingWidget", [_WidgetBase, _TemplatedMixin],{
 		greetingName: 'No name',
 		author: "An anonymous person",
@@ -26,6 +23,7 @@ define([
 		mouseAnim: null,
 		baseBackgroundColor: "#fff",
 		mouseBackgroundColor: "#def",
+
 		postCreate: function(){
 			var domNode = this.domNode;
 			this.inherited(arguments);
@@ -35,6 +33,7 @@ define([
 				on(domNode, mouse.leave, lang.hitch(this, "_changeBackground", this.baseBackgroundColor))
 			)
 		},
+
 		_changeBackground: function(newColor){
 			if (this.mouseAnim){
 				this.mouseAnim.stop();
@@ -49,32 +48,32 @@ define([
 				})
 			}).play();
 		},
+
 		_setDeleteUrlAttr: function(imagePath){
 			if (imagePath != ''){
 				this._set("deleteUrl", imagePath);
 				this.deleteUrlNode.src = imagePath;
 			}
 		},
+
 		_setUpdateUrlAttr: function(imagePath){
 			if (imagePath != ''){
 				this._set("updateUrl", imagePath);
 				this.updateUrlNode.src = imagePath;
 			}
 		},
+
 		_showGreetingDetail: function(){
-			var greeting = {
-				greetingName: this.greetingName,
-				url: this.url,
-				greetingContent: this.content};
-			var greetingdetail = new GreetingUpdate(greeting);
-			greetingdetail.startup();
-			greetingdetail.show();
+
 		},
+
 		_updateGreeting: function(){
 			this._showGreetingDetail()
 		},
+
 		_deleteGreeting: function(e){
 			var url = this.url;
+			if (comfirm)
 			var dialog = new ConfirmDialog({
 				title: "Remove Greeting Confirm",
 				content: "Do you want to remove this Greeting?",

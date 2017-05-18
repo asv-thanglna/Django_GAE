@@ -1,14 +1,11 @@
 body {
   font-family: Verdana, Helvetica, sans-serif;
-  background-color: #DDDDDD;
-}
+  background-color: #DDDDDD; }
 
-div.loginContainer{
+div.loginContainer {
   float: right;
   font-style: italic;
-  margin: 5px;
-}
+  margin: 5px; }
 
-div.loginContainer a{
-  cursor: pointer;
-}
+div.loginContainer a {
+  cursor: pointer; }
