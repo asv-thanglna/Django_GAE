@@ -8,34 +8,6 @@
 	<link type="text/css" rel="stylesheet" href="/static/css/GreetingWidget.css"/>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-	<script>
-		function csrfSafeMethod(method) {
-			// these HTTP methods do not require CSRF protection
-			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-		}
-		$.ajaxSetup({
-			crossDomain: false, // obviates need for sameOrigin test
-			beforeSend: function(xhr, settings) {
-				if (!csrfSafeMethod(settings.type)) {
-					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-				}
-			}
-		});
-{#		$.get("http://127.0.0.1:8080/api/v1/default_guestbook/greetings/");#}
-{#		$.ajax({#}
-{#			url: "http://127.0.0.1:8080/api/v1/default_guestbook/6612462929444864/",#}
-{#			method: "PUT",#}
-{#			data: JSON.stringify({'content': 'neontent', 'name': 'new' }),#}
-{#			dataType: 'json',#}
-{#			contentType: 'application/json; charset=utf-8',#}
-{#			success: function(data){#}
-{#				alert(data.msg)#}
-{#			},#}
-{#			failure: function(){#}
-{#				alert('error')#}
-{#			}#}
-{#		});#}
-	</script>
 </head>
 <body class="claro">
 {#	<table>#}
@@ -112,7 +84,7 @@
 		require([
 			"dojo/request", "dojo/dom", "dojo/_base/array", "dijit/form/Button", "dojo/cookie",
 			"dojo/parser", "widgets/GreetingsWidget", "dojo/domReady!"
-			], function(request, dom, arrayUtil, Button, cookie, parser, GreetingsWidget, GreetingDetail){
+			], function(request, dom, arrayUtil, Button, cookie, parser, GreetingsWidget){
 				cookie("csrf_token", "{{ csrf_token }}");
 				request("/api/v1/default_guestbook/greetings/?limit=10", {
 					handleAs: 'json'

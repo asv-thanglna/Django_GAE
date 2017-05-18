@@ -13,17 +13,12 @@ define([
 		"dijit/_WidgetBase",
 		"dijit/_TemplatedMixin",
 		"dijit/ConfirmDialog",
-		"dojo/text!./templates/GreetingWidget.html",
-		"widgets/GreetingDetail"
-	], function(declare, baseFx, lang, arrayUtil, dom, domStyle, mouse, on, request, cookie, _WidgetBase, _TemplatedMixin, ConfirmDialog, template, GreetingDetail){
+		"dojo/text!./templates/GreetingsWidget.html",
+		"widgets/GreetingUpdate"
+	], function(declare, baseFx, lang, arrayUtil, dom, domStyle, mouse, on, request, cookie, _WidgetBase, _TemplatedMixin, ConfirmDialog, template, GreetingUpdate){
 	return declare("GreetingWidget", [_WidgetBase, _TemplatedMixin],{
-		greetingName: 'no name',
-		content: "",
+		greetingName: 'No name',
 		author: "An anonymous person",
-		updatedBy: "",
-		updatedDate: "",
-		date: "",
-		url: "",
 		deleteUrl: require.toUrl("../static/img/delete.png"),
 		updateUrl: require.toUrl("../static/img/update.png"),
 		templateString: template,
@@ -66,41 +61,22 @@ define([
 				this.updateUrlNode.src = imagePath;
 			}
 		},
-		_showGreetingDetail: function(e){
-			//var url = "/update?guestbook_name=" + this.guestbookName + '&guestbook_id=' + this.id;
-			//window.location = url;
-			var greeting = { greetingName: this.greetingName, greetingContent: this.content };
-			var greetingdetail = new GreetingDetail(greeting);
+		_showGreetingDetail: function(){
+			var greeting = {
+				greetingName: this.greetingName,
+				url: this.url,
+				greetingContent: this.content};
+			var greetingdetail = new GreetingUpdate(greeting);
 			greetingdetail.startup();
 			greetingdetail.show();
 		},
-		_updateGreeting: function(e){
-			var url = "/update?guestbook_name=" + this.guestbookName + '&guestbook_id=' + this.id;
-			window.location = url;
-			//var url = this.url;
-			//request(url, {
-			//	method: 'PUT',
-			//	data: JSON.stringify({'content': 'new content', 'greetingName': 'New Name 222'}),
-			//	//handleAs: 'json',
-			//	headers: {
-			//		"Content-Type": 'application/json; charset=utf-8',
-			//		"Accept": "application/json",
-			//		"X-CSRFToken": cookie("csrf_token")
-			//    }
-			//}).then(function(data){
-			//	console.log(data);
-			//},function(err){
-			//	console.log(err);
-			//},function(evt){
-			//	console.log(evt);
-			//});
+		_updateGreeting: function(){
+			this._showGreetingDetail()
 		},
 		_deleteGreeting: function(e){
 			var url = this.url;
 			var dialog = new ConfirmDialog({
-				// Dialog title
 				title: "Remove Greeting Confirm",
-				// Create Dialog content
 				content: "Do you want to remove this Greeting?",
 				style: "width: 600px",
 				onExecute: function(){
