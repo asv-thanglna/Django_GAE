@@ -10,32 +10,6 @@
 
 </head>
 <body class="claro">
-{#	<table>#}
-{#	{% for greeting in guestbook_list %}#}
-{#		<tr>#}
-{#		<td>#}
-{#		{% if greeting.author.nickname %}#}
-{#			<b>{{ greeting.author }}</b> wrote:#}
-{#		{% else %}#}
-{#			An anonymous person wrote:#}
-{#		{% endif %}#}
-{#		</td>#}
-{#		<td>#}
-{#			<blockquote>{{ greeting.content|escape }}</blockquote>#}
-{#		</td>#}
-{#		<td><a href="{% url 'update' %}?guestbook_id={{ greeting.id }}&guestbook_name={{ guestbook_name }}">update</a></td>#}
-{#		<td>#}
-{#			<form id="deleteForm_{{ greeting.id }}" action="#}
-{#			{% url 'delete' greeting.id guestbook_name %}" method="post">#}
-{#				{% csrf_token %}#}
-{#			</form>#}
-{#			<a href="#" onclick="document.getElementById('deleteForm_{{ greeting.id }}')#}
-{#						.submit()">delete</a>#}
-{#			</td>#}
-{#		</tr>#}
-{#	{% endfor %}#}
-{#	</table>#}
-{#	<br/>#}
 	<div style="width: 100%; height: 50px;">
 		<div class="loginContainer">
 			{% if user_email != '' %}
@@ -46,9 +20,6 @@
 	</div>
 	<div>
 		<a href="{% url 'sign' %}?guestbook_name={{ guestbook_name }}">Sign GuestBook</a>
-{#		<button id="btn" data-dojo-type="dijit/form/Button" data-dojo-props="onClick: function(){#}
-{#		console.log('First button was clicked!'); }">Sign Greeting#}
-{#		</button>#}
 	</div>
 
 	<div id="greetingContainer"></div>
@@ -67,6 +38,7 @@
 		var dojoConfig = {
 			async: true,
 			parseOnLoad : true,
+			isDebug: true,
 {#			baseUrl: '../../static/js/dojo/1.10.4/dojo',#}
 			baseUrl: '//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js',
 			paths: {
@@ -82,18 +54,10 @@
 	<script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
 	<script>
 		require([
-			"dojo/request", "dojo/dom", "dojo/_base/array", "dijit/form/Button", "dojo/cookie",
-			"dojo/parser", "widgets/GreetingsWidget", "dojo/domReady!"
-			], function(request, dom, arrayUtil, Button, cookie, parser, GreetingsWidget){
+			"dojo/cookie", "widgets/GreetingApp", "dojo/domReady!"
+			], function(cookie, GreetingsApp){
 				cookie("csrf_token", "{{ csrf_token }}");
-				request("/api/v1/default_guestbook/greetings/?limit=10", {
-					handleAs: 'json'
-				}).then(function(data){
-					var greetingContainer = dom.byId("greetingContainer");
-					arrayUtil.forEach(data.greetings, function(greeting){
-						var widget = new GreetingsWidget(greeting).placeAt(greetingContainer);
-					});
-				})
+				GreetingsApp();
 			})
 	</script>
 </body>

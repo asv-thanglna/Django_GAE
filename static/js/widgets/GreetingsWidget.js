@@ -1,18 +1,15 @@
 
 define([
 		"dojo/_base/declare",
-		"dojo/_base/fx",
 		"dojo/_base/lang",
-		"dojo/dom-style",
-		"dojo/mouse",
+		"dojo/_base/array",
 		"dojo/on",
-		"dojo/request",
+		"dojo/request/xhr",
 		"dojo/cookie",
 		"dijit/_WidgetBase",
 		"dijit/_TemplatedMixin",
-		"dijit/ConfirmDialog",
 		"dojo/text!./templates/GreetingsWidget.html"
-	], function(declare, baseFx, lang, domStyle, mouse, on, request, cookie, _WidgetBase, _TemplatedMixin, ConfirmDialog, template){
+	], function(declare, lang, arrayUtil, on, xhr, cookie, _WidgetBase, _TemplatedMixin, template){
 	return declare("GreetingWidget", [_WidgetBase, _TemplatedMixin],{
 		greetingName: 'No name',
 		author: "An anonymous person",
@@ -20,33 +17,13 @@ define([
 		updateUrl: require.toUrl("../static/img/update.png"),
 		templateString: template,
 		baseClass: "greetingWidget",
-		mouseAnim: null,
-		baseBackgroundColor: "#fff",
-		mouseBackgroundColor: "#def",
 
 		postCreate: function(){
-			var domNode = this.domNode;
 			this.inherited(arguments);
-			domStyle.set(domNode, "backgroundColor", this.baseBackgroundColor);
 			this.own(
-				on(domNode, mouse.enter, lang.hitch(this, "_changeBackground", this.mouseBackgroundColor)),
-				on(domNode, mouse.leave, lang.hitch(this, "_changeBackground", this.baseBackgroundColor))
+				on(this.deleteUrlNode, 'click', lang.hitch(this, "_deleteGreeting")),
+				on(this.updateUrlNode, 'click', lang.hitch(this, "_updateGreeting"))
 			)
-		},
-
-		_changeBackground: function(newColor){
-			if (this.mouseAnim){
-				this.mouseAnim.stop();
-			}
-			this.mouseAnim = baseFx.animateProperty({
-				node: this.domNode,
-				properties: {
-					backgroundColor: newColor
-				},
-				onEnd: lang.hitch(this, function(){
-					this.mouseAnim = null;
-				})
-			}).play();
 		},
 
 		_setDeleteUrlAttr: function(imagePath){
@@ -71,29 +48,20 @@ define([
 			this._showGreetingDetail()
 		},
 
-		_deleteGreeting: function(e){
-			var url = this.url;
-			if (comfirm)
-			var dialog = new ConfirmDialog({
-				title: "Remove Greeting Confirm",
-				content: "Do you want to remove this Greeting?",
-				style: "width: 600px",
-				onExecute: function(){
-					request(url, {
-						method: 'DELETE',
-						headers: {
-							"Content-Type": 'application/json; charset=utf-8',
-							"Accept": "application/json",
-							"X-CSRFToken": cookie("csrf_token")
-						}
-					}).then(function(data){
-
-					},function(err){
-						console.log(err);
-					});
-				}
-			});
-			dialog.show();
+		_deleteGreeting: function(){
+			if(confirm("Are you sure?")){
+				xhr.del(this.url, {
+					headers: {
+						"Content-Type": 'application/json; charset=utf-8',
+						"Accept": "application/json",
+						"X-CSRFToken": cookie("csrf_token")
+					}
+				}).then(function(data){
+					console.log(data);
+				}, function(error){
+					console.log("error")
+				});
+			}
 		}
 	})
 });

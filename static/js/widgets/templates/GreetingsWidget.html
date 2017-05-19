@@ -1,14 +1,10 @@
 <div>
-	<h3 data-dojo-attach-point="greetingNameNode"
-	    data-dojo-attach-event="onClick:_showGreetingDetail">${greetingName}</h3>
+	<h3 data-dojo-attach-point="greetingNameNode">${greetingName}</h3>
 	<p data-dojo-attach-point="contentNode">${!content}</p>
 	<div>Author: <h4>${author}</h4>
 		<h6>${date}</h6>
 	</div>
 
-	<img data-dojo-attach-point="deleteUrlNode"
-	     data-dojo-attach-event="onClick:_deleteGreeting"/>
-
-	<img data-dojo-attach-point="updateUrlNode"
-	     data-dojo-attach-event="onClick:_updateGreeting"/>
+	<img data-dojo-attach-point="deleteUrlNode"/>
+	<img data-dojo-attach-point="updateUrlNode"/>
 </div>
