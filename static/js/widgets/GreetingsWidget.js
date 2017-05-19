@@ -1,15 +1,16 @@
 
 define([
-		"dojo/_base/declare",
-		"dojo/_base/lang",
-		"dojo/_base/array",
-		"dojo/on",
-		"dojo/request/xhr",
-		"dojo/cookie",
-		"dijit/_WidgetBase",
-		"dijit/_TemplatedMixin",
-		"dojo/text!./templates/GreetingsWidget.html"
-	], function(declare, lang, arrayUtil, on, xhr, cookie, _WidgetBase, _TemplatedMixin, template){
+	"dojo/_base/declare",
+	"dojo/_base/lang",
+	"dojo/_base/array",
+	"dojo/on",
+	"dojo/dom-style",
+	"dojo/request/xhr",
+	"dojo/cookie",
+	"dijit/_WidgetBase",
+	"dijit/_TemplatedMixin",
+	"dojo/text!./templates/GreetingsWidget.html"
+	], function(declare, lang, arrayUtil, on, domStyle, xhr, cookie, _WidgetBase, _TemplatedMixin, template){
 	return declare("GreetingWidget", [_WidgetBase, _TemplatedMixin],{
 		greetingName: 'No name',
 		author: "An anonymous person",
@@ -20,9 +21,36 @@ define([
 
 		postCreate: function(){
 			this.inherited(arguments);
+			this._changeGreetingUpdateAndDetail(true);
 			this.own(
 				on(this.deleteUrlNode, 'click', lang.hitch(this, "_deleteGreeting")),
-				on(this.updateUrlNode, 'click', lang.hitch(this, "_updateGreeting"))
+				on(this.updateUrlNode, 'click', lang.hitch(this, "_updateGreeting")),
+				on(this.updateButtonNode, 'click', lang.hitch(this, function(){
+					var greetingWidget = this;
+					var newGreetingName = this.greetingNameNode.value;
+					var newGreetingContent = this.contentNode.value;
+					xhr.put(this.url, {
+						data: JSON.stringify({
+							greetingName: newGreetingName,
+							content: newGreetingContent
+						}),
+						headers: {
+							"Content-Type": 'application/json; charset=utf-8',
+							"Accept": "application/json",
+							"X-CSRFToken": cookie("csrf_token")
+						}
+					}).then(function(data){
+						greetingWidget.greetingName = newGreetingName;
+						greetingWidget.content = newGreetingContent;
+						greetingWidget._changeGreetingUpdateAndDetail(true);
+					}, function(error){
+						console.log(error);
+					});
+
+				})),
+				on(this.cancelButtonNode, 'click', lang.hitch(this, function(){
+					this._changeGreetingUpdateAndDetail(true);
+				}))
 			)
 		},
 
@@ -40,12 +68,18 @@ define([
 			}
 		},
 
-		_showGreetingDetail: function(){
-
+		_changeGreetingUpdateAndDetail: function(value){
+			if (value){
+				domStyle.set(this.greetingDetailNode, "display", "block");
+				domStyle.set(this.greetingUpdateNode, "display", "None");
+			}else{
+				domStyle.set(this.greetingDetailNode, "display", "None");
+				domStyle.set(this.greetingUpdateNode, "display", "block");
+			}
 		},
 
 		_updateGreeting: function(){
-			this._showGreetingDetail()
+			this._changeGreetingUpdateAndDetail(false);
 		},
 
 		_deleteGreeting: function(){
