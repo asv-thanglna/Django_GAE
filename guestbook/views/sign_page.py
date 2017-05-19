@@ -14,10 +14,10 @@ class SignView(FormView):
 	form_class = SignForm
 	success_url = reverse_lazy('index')
 
-	def sign_book(self, guestbook_name, content):
+	def sign_book(self, guestbook_name, greeting_name, content):
 		if guestbook_name != '':
 			user = users.get_current_user()
-			greeting = Greeting.insert_greeting(guestbook_name, user, content)
+			greeting = Greeting.insert_greeting(guestbook_name, greeting_name, user, content)
 			add_queue_send_mail(user, guestbook_name, greeting.content)
 
 	def get_guestbook_name(self):
@@ -47,7 +47,8 @@ class SignView(FormView):
 			return self.form_invalid(form)
 
 	def form_valid(self, form, **kwargs):
-		self.sign_book(form.cleaned_data['guestbook_name'], form.cleaned_data['content'])
+		self.sign_book(form.cleaned_data['guestbook_name'], form.cleaned_data['greeting_name'],
+			form.cleaned_data['content'])
 		return super(SignView, self).form_valid(form, **kwargs)
 
 	def get_success_url(self):

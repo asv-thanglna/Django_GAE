@@ -1,72 +1,53 @@
 {% load i18n %}
 <html>
 <head>
+	<meta charset="utf-8">
+	<title>Index Page</title>
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/claro/claro.css">
 	<link type="text/css" rel="stylesheet" href="/static/css/main.css"/>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script>
-		function csrfSafeMethod(method) {
-			// these HTTP methods do not require CSRF protection
-			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-		}
-		$.ajaxSetup({
-			crossDomain: false, // obviates need for sameOrigin test
-			beforeSend: function(xhr, settings) {
-				if (!csrfSafeMethod(settings.type)) {
-					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-				}
-			}
-		});
-{#		$.get("http://127.0.0.1:8080/api/v1/default_guestbook/greetings/");#}
-		$.ajax({
-			url: "http://127.0.0.1:8080/api/v1/default_guestbook/6612462929444864/",
-			method: "DELETE",
-{#			data: JSON.stringify({ 'content': 'new content' }),#}
-{#			dataType: 'json',#}
-			contentType: 'application/json; charset=utf-8',
-			success: function(data){
-				alert(data.msg)
-			},
-			failure: function(){
-				alert('error')
-			}
-		});
-	</script>
+	<link type="text/css" rel="stylesheet" href="/static/css/GreetingWidget.css"/>
 </head>
-<body>
-	<table>
-	{% for greeting in guestbook_list %}
-		<tr>
-		<td>
-		{% if greeting.author.nickname %}
-			<b>{{ greeting.author }}</b> wrote:
-		{% else %}
-			An anonymous person wrote:
-		{% endif %}
-		</td>
-		<td>
-			<blockquote>{{ greeting.content|escape }}</blockquote>
-		</td>
-		<td><a href="{% url 'update' %}?guestbook_id={{ greeting.id }}&guestbook_name={{ guestbook_name }}">update</a></td>
-		<td>
-			<form id="deleteForm_{{ greeting.id }}" action="
-			{% url 'delete' greeting.id guestbook_name %}" method="post">
-				{% csrf_token %}
-			</form>
-			<a href="#" onclick="document.getElementById('deleteForm_{{ greeting.id }}')
-						.submit()">delete</a>
-			</td>
-		</tr>
-	{% endfor %}
-	</table>
-	{% if guestbook_list|length > 0 %}
-		<a href="{% url 'index' %}?guestbook_name={{ guestbook_name }}">first</a>
-		{% if more %}
-			<a href="{% url 'index' %}?guestbook_name=
-			{{ guestbook_name }}&cursor={{ next_cursor }}">next</a>
-		{% endif %}
-		<br/>
-	{% endif %}
-	<a href="{% url 'sign' %}?guestbook_name={{ guestbook_name }}">Sign GuestBook</a>
-	<a href="{{ url }}">{{ url_linktext }}</a>
+<body class="claro">
+	<div style="width: 100%; height: 50px;">
+		<div class="loginContainer">
+			{% if user_email != '' %}
+				<b> {{ user_email }} </b>
+			{% endif %}
+			<a href="{{ url }}">{{ url_linktext }}</a>
+		</div>
+	</div>
+	<div>
+		<a href="{% url 'sign' %}?guestbook_name={{ guestbook_name }}">Sign GuestBook</a>
+	</div>
+
+	<div id="greetingContainer"></div>
+
+{#	test dojo#}
+	<script>
+		var dojoConfig = {
+			async: true,
+			parseOnLoad : true,
+			isDebug: true,
+{#			baseUrl: '../../static/js/dojo/1.10.4/dojo',#}
+			baseUrl: '//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js',
+			paths: {
+				widgets: '/static/js/widgets'
+			},
+			settings: {
+				csrfToken: '{{ csrf_token|escapejs }}'
+			}
+		};
+	</script>
+
+{#	<script type="text/javascript" src="/static/js/dojo/1.10.4/dojo/dojo.js"></script>#}
+	<script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
+	<script>
+		require([
+			"dojo/cookie", "widgets/GreetingApp", "dojo/domReady!"
+			], function(cookie, GreetingsApp){
+				cookie("csrf_token", "{{ csrf_token }}");
+				GreetingsApp();
+			})
+	</script>
 </body>
 </html>
