@@ -49,7 +49,7 @@
       <root url="file:///usr/local/google_appengine/lib/prettytable" />
       <root url="file:///usr/local/google_appengine/lib/mox" />
       <root url="file:///usr/local/google_appengine/lib/PyAMF-0.7.2" />
-      <root url="file:///usr/local/google_appengine/lib/django-1.11" />
+      <root url="file:///usr/local/google_appengine/lib/django-1.5" />
       <root url="file:///usr/local/google_appengine/lib/webapp2-2.5.2" />
       <root url="file:///usr/local/google_appengine/lib/webob-1.2.3" />
       <root url="file:///usr/local/google_appengine/lib/yaml-3.10" />

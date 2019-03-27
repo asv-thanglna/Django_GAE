@@ -1,0 +1,35 @@
+<div>
+	<div data-dojo-attach-point="greetingDetailNode">
+		<h3 data-dojo-attach-point="greetingNameNode">${greetingName}</h3>
+		<p data-dojo-attach-point="contentNode">${!content}</p>
+		<div>Author: <h4>${author}</h4>
+			<h6>${date}</h6>
+		</div>
+
+		<img data-dojo-attach-point="deleteUrlNode"/>
+		<img data-dojo-attach-point="updateUrlNode"/>
+	</div>
+	<div data-dojo-attach-point="greetingUpdateNode">
+		<table width="100%">
+			<tr>
+				<td width="35%">Greeting Name</td>
+				<td width="65%">
+					<input data-dojo-attach-point="greetingNameNode" style="width: 100%;"
+					       value="${greetingName}"/>
+				</td>
+			</tr>
+			<tr>
+				<td>Content</td>
+				<td><textarea data-dojo-attach-point="contentNode" style="width: 100%;"
+				              rows="5">${!content}</textarea></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<input type="button" data-dojo-attach-point="updateButtonNode" value="update">
+					<input type="button" data-dojo-attach-point="cancelButtonNode" value="cancel">
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
