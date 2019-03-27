@@ -27,6 +27,6 @@ static/js/release
 node_modules
 
 # Jetbrain IDE related files
-/.idea/
+.idea/
 *.iml
 /*.iml
