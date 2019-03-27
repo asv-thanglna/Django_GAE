@@ -26,5 +26,7 @@ static/js/release
 
 node_modules
 
-# Pycharm project files
-.idea/
+# Jetbrain IDE related files
+/.idea/
+*.iml
+/*.iml
